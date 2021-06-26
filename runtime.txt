@@ -1,1 +1,5 @@
 python-3.9.5
+tzlocal-2.1
+pytz
+datetime-5.4.0
+translate-3.5.0
