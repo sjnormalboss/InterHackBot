@@ -705,8 +705,6 @@ async def info(ctx):
 
     await ctx.send(embed=guildid)
 
-with open("token.txt", "r") as token:
-    token = token.readline()
 
 client.run(token)
 
