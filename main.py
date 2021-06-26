@@ -12,6 +12,7 @@ import asyncio
 from translate import Translator
 from collections.abc import Sequence
 from itertools import cycle
+import os
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -706,5 +707,8 @@ async def info(ctx):
     await ctx.send(embed=guildid)
 
 
-client.run(token)
+
+
+
+client.run(os.environ['token'])
 
