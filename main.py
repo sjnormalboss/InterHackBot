@@ -27,7 +27,7 @@ prefix = "."
 client = commands.Bot(description="Hackathon Bot", command_prefix=prefix)
 client.remove_command("help")
 
-status = cycle(['InterHacks', 'BeingLazy', 'StemWorlds', 'NapTime'])
+status = cycle(['InterHacks', 'BeingLazy', 'StemWorlds', '.help'])
 
 # Variables
 
