@@ -1,8 +1,10 @@
 import discord
 from discord import Client
+from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands, tasks
 from discord.utils import find
 import logging
+import random
 import json
 from tzlocal import get_localzone
 import pytz
@@ -13,7 +15,9 @@ from translate import Translator
 from collections.abc import Sequence
 from itertools import cycle
 import os
+import requests
 
+#########################
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='discord.log',
@@ -38,8 +42,42 @@ voiceChannel = 0
 @client.event
 async def on_ready():
     change_status.start()
+    auto_motivate.start()
     print(f"Bot has logged in as {client.user}")
 
+@tasks.loop(seconds=21600)
+async def auto_motivate():
+  response=requests.get("https://zenquotes.io/api/random")
+  json_data=json.loads(response.text)
+  quote =json_data[0]['q']
+  list=quote.split()
+
+  ran=["photo.jpg","photo2.jpg","photo3.jpg","photo4.jpg"]
+  img = Image.open(random.choice(ran))
+  img = img.resize((9000, 8000))
+
+  myFont = ImageFont.truetype('PermanentMarker-Regular.ttf', 400)
+
+  list1=list[:5]
+  list2=list[5:10]
+  list3=list[10:15]
+  list4=list[15:]
+  author= " -"+json_data[0]["a"]
+
+  image_edit=ImageDraw.Draw(img)
+  image_edit.text((600,1000)," ".join(list1),(237,230,211),font=myFont)
+  image_edit.text((600,1400)," ".join(list2),(237,230,211),font=myFont)
+  image_edit.text((600,1800)," ".join(list3),(237,230,211),font=myFont)
+  image_edit.text((600,2200)," ".join(list4),(237,230,211),font=myFont)
+  image_edit.text((900,2600),author,(237,230,211),font=myFont)
+  img.save("done.jpg")
+
+  embed = discord.Embed(title="Inspiration", color=0x00ff00) #creates embed
+  file = discord.File("/home/runner/StemWarrior/done.jpg", filename="done.jpg")
+  embed.set_image(url="attachment://done.jpg")
+  embed.set_footer(text="Automatic quotes for your server")
+  channel = client.get_channel(880646311085490237)     #channel id you may change this
+  await channel.send(file=file, embed=embed)
 
 @client.command()
 async def help(ctx, args=None):
@@ -76,6 +114,11 @@ async def help(ctx, args=None):
         name="Misc",
         value=
         "export - Creates a txt file of all messages in a channel \n defaultchannel *Admin only - Sets default channel for bot messages \n editInfo *Admin only - Changes message shown on loadInfo \n info - Loads information set by Admin",
+        inline=False)
+    help_embed.add_field(
+        name="motivate",
+        value=
+        "Sends a nice quote",
         inline=False)
 
     await ctx.send(embed=help_embed)
@@ -706,9 +749,37 @@ async def info(ctx):
 
     await ctx.send(embed=guildid)
 
+@client.command()
+async def motivate(ctx):
+  response=requests.get("https://zenquotes.io/api/random")
+  json_data=json.loads(response.text)
+  quote =json_data[0]['q']
+  list=quote.split()
 
+  ran=["photo.jpg","photo2.jpg","photo3.jpg","photo4.jpg"]
+  img = Image.open(random.choice(ran))
+  img = img.resize((9000, 8000))
 
+  myFont = ImageFont.truetype('PermanentMarker-Regular.ttf', 400)
 
+  list1=list[:5]
+  list2=list[5:10]
+  list3=list[10:15]
+  list4=list[15:]
+  author= " -"+json_data[0]["a"]
+
+  image_edit=ImageDraw.Draw(img)
+  image_edit.text((600,1000)," ".join(list1),(237,230,211),font=myFont)
+  image_edit.text((600,1400)," ".join(list2),(237,230,211),font=myFont)
+  image_edit.text((600,1800)," ".join(list3),(237,230,211),font=myFont)
+  image_edit.text((600,2200)," ".join(list4),(237,230,211),font=myFont)
+  image_edit.text((900,2600),author,(237,230,211),font=myFont)
+
+  img.save("done.jpg")
+
+  embed = discord.Embed(title="Inspiration", color=0x00ff00) #creates embed
+  file = discord.File("/home/runner/StemWarrior/done.jpg", filename="done.jpg")     #please write your absolute path of done.jpg file
+  embed.set_image(url="attachment://done.jpg")
+  await ctx.reply(file=file, embed=embed)
 
 client.run(os.environ['token'])
-
